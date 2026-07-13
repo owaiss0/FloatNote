@@ -256,6 +256,17 @@ body {
     font-family: monospace;
 }
 
+.quarantine-tip {
+    font-size: 11px;
+    color: var(--text-secondary);
+    background-color: rgba(234, 179, 8, 0.05);
+    border: 1px solid rgba(234, 179, 8, 0.15);
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-top: 16px;
+    max-width: 480px;
+}
+
 /* Features Grid */
 .features {
     padding: 80px 6%;
