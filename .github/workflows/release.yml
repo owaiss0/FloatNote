@@ -1,0 +1,59 @@
+name: Build & Release DMG
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Build App (Release Mode)
+      run: swift build -c release
+
+    - name: Package App Bundle
+      run: |
+        mkdir -p FloatNote.app/Contents/MacOS
+        cp .build/release/FloatNote FloatNote.app/Contents/MacOS/FloatNote
+        
+        # Create Info.plist so macOS recognizes the app bundle and Menu Bar accessory behaviors
+        cat <<EOF > FloatNote.app/Contents/Info.plist
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>CFBundleExecutable</key>
+            <string>FloatNote</string>
+            <key>CFBundleIdentifier</key>
+            <string>com.owais.FloatNote</string>
+            <key>CFBundleName</key>
+            <string>FloatNote</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+            <key>CFBundleShortVersionString</key>
+            <string>1.0.0</string>
+            <key>LSMinimumSystemVersion</key>
+            <string>11.0</string>
+            <key>LSUIElement</key>
+            <true/>
+        </dict>
+        </plist>
+        EOF
+
+    - name: Create DMG
+      run: |
+        hdiutil create -volname "FloatNote" -srcfolder FloatNote.app -ov -format UDZO FloatNote.dmg
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: FloatNote.dmg
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
