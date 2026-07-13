@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FloatNote — Floating Sticky Notes for macOS</title>
+    <meta name="description" content="A sleek, native floating sticky notes manager for macOS with Markdown support, focus-aware auto-hide, and custom keyboard shortcut recording.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <span class="logo-icon">📝</span>
+            <span class="logo-text">FloatNote</span>
+        </div>
+        <nav class="nav">
+            <a href="#features">Features</a>
+            <a href="#demo">Interactive Demo</a>
+            <a href="https://github.com/owaiss0/FloatNote" class="btn btn-secondary" target="_blank">
+                <svg class="github-icon" viewBox="0 0 16 16" width="16" height="16"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+                GitHub
+            </a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <span class="badge">macOS Utility</span>
+                <h1>Your Thoughts. <br><span class="gradient-text">Always Floating.</span></h1>
+                <p class="hero-subtext">A sleek, native sticky notes manager for macOS. Keep snippets, checklists, and references floating overlay-style, complete with focus-aware auto-fading and customized shortcut mapping.</p>
+                <div class="hero-ctas">
+                    <a href="https://github.com/owaiss0/FloatNote" class="btn btn-primary" target="_blank">Download for macOS</a>
+                    <a href="#demo" class="btn btn-outline">See How It Works</a>
+                </div>
+            </div>
+            
+            <div class="hero-visual">
+                <div class="macbook-frame">
+                    <div class="sticky-note-preview yellow-note">
+                        <div class="note-header">
+                            <span class="note-dots"></span>
+                            <span class="note-title">Project Ideas</span>
+                            <span class="note-actions">📌</span>
+                        </div>
+                        <div class="note-body">
+                            <p><strong>To-Do Today:</strong></p>
+                            <ul>
+                                <li>Configure GitHub Actions Workflow ✅</li>
+                                <li>Widen Settings Popover width to 200px ✅</li>
+                                <li>Enable native window dragging ✅</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="sticky-note-preview pink-note">
+                        <div class="note-header">
+                            <span class="note-dots"></span>
+                            <span class="note-title">Draft Snippet</span>
+                            <span class="note-actions">🔒</span>
+                        </div>
+                        <div class="note-body">
+                            <pre><code>func greet() {
+    print("Welcome to FloatNote!")
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <h2 class="section-title">Designed for Pro Workflows</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">📌</span>
+                    <h3>Floating Overlays</h3>
+                    <p>Notes float above fullscreen apps and spaces. Pin notes to stay Always-on-Top or set them to read-only lock.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">👁️</span>
+                    <h3>Focus-Aware Auto-Hide</h3>
+                    <p>Notes automatically fade out when you focus other windows and reappear instantly when you hover, click, or type.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🎹</span>
+                    <h3>Shortcut Builder</h3>
+                    <p>Map your own custom modifier keys (⌘, ⌥, ⇧, ⌃) and characters to create global hotkeys for Note triggers.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📑</span>
+                    <h3>Notes Dashboard</h3>
+                    <p>Manage all notes in a dynamic dual-column dashboard. Filter notes instantly with built-in search indexing.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="demo" class="demo-section">
+            <h2 class="section-title">Interactive Shortcut Simulator</h2>
+            <p class="demo-subtext">Click on any hotkey combination below to see how FloatNote's window triggers react on screen.</p>
+            
+            <div class="simulator-container">
+                <div class="keyboard">
+                    <div class="keyboard-row">
+                        <button class="key modifier" id="cmd-key">Command (⌘)</button>
+                        <button class="key modifier" id="shift-key">Shift (⇧)</button>
+                        <button class="key character" id="n-key">N</button>
+                        <button class="key character" id="w-key">W</button>
+                        <button class="key character" id="a-key">A</button>
+                        <button class="key character" id="s-key">S</button>
+                    </div>
+                </div>
+
+                <div class="screen-preview">
+                    <div class="screen-header">
+                        <span class="screen-dot red"></span>
+                        <span class="screen-dot yellow"></span>
+                        <span class="screen-dot green"></span>
+                        <span class="screen-title">FloatNote Workspace</span>
+                    </div>
+                    <div class="screen-body" id="screen-body">
+                        <div class="placeholder-text">Press a hotkey combination above to test (e.g. ⌘ + N)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 FloatNote. Open sourced under the MIT License.</p>
+        <p>Created by Owais. Supported by SwiftUI and AppKit.</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
