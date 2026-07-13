@@ -21,9 +21,11 @@ jobs:
     - name: Package App Bundle
       run: |
         mkdir -p FloatNote.app/Contents/MacOS
+        mkdir -p FloatNote.app/Contents/Resources
         cp .build/release/FloatNote FloatNote.app/Contents/MacOS/FloatNote
+        cp Assets/AppIcon.icns FloatNote.app/Contents/Resources/AppIcon.icns
         
-        # Create Info.plist so macOS recognizes the app bundle and Menu Bar accessory behaviors
+        # Create Info.plist so macOS recognizes the app bundle, icon, and Menu Bar accessory behaviors
         cat <<EOF > FloatNote.app/Contents/Info.plist
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -31,6 +33,8 @@ jobs:
         <dict>
             <key>CFBundleExecutable</key>
             <string>FloatNote</string>
+            <key>CFBundleIconFile</key>
+            <string>AppIcon.icns</string>
             <key>CFBundleIdentifier</key>
             <string>com.owais.FloatNote</string>
             <key>CFBundleName</key>
