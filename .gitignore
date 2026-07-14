@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Swift Package Manager / Xcode Build
+.build/
+Packages/
+.swiftpm/
+DerivedData/
+
+# IDEs & Tools
+.vscode/
+.xcodeproj/
+.xcworkspace/
+.agents/
+.claude/
+.gemini/
+*.zip
+*.dmg
