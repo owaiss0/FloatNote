@@ -1,9 +1,0 @@
-.DS_Store
-.build/
-.swiftpm/
-Packages/
-Package.resolved
-.agents/
-.claude/
-.gemini/
-*.log
