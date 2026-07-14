@@ -330,20 +330,8 @@ public struct StickyNoteView: View {
         }
         // Force Light colorScheme to avoid dark-mode contrast issues
         .colorScheme(.light)
-        // Dialog alert for close action
-        .confirmationDialog("What do you want to do with this note?", isPresented: $showCloseAlert, titleVisibility: .visible) {
-            Button("Keep & Hide Note") {
-                WindowManager.shared.hideNote(note)
-            }
-            Button("Delete Permanently", role: .destructive) {
-                WindowManager.shared.deleteNote(note)
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("This note has content. You can hide it to view later, or delete it permanently.")
-        }
         .onReceive(NotificationCenter.default.publisher(for: Notification.Name("TriggerClosePrompt-\(note.id.uuidString)"))) { _ in
-            showCloseAlert = true
+            triggerCloseAction()
         }
         // Right-Click Context Menu
         .contextMenu {
@@ -442,7 +430,23 @@ public struct StickyNoteView: View {
         if note.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             WindowManager.shared.deleteNote(note)
         } else {
-            showCloseAlert = true
+            let alert = NSAlert()
+            alert.messageText = "Close Note"
+            alert.informativeText = "What do you want to do with this note? You can hide it to view later, or delete it permanently."
+            alert.alertStyle = .warning
+            alert.addButton(withTitle: "Keep & Hide Note")
+            alert.addButton(withTitle: "Cancel")
+            alert.addButton(withTitle: "Delete Permanently")
+            
+            // Activate the app so the alert modal handles focus properly
+            NSApp.activate(ignoringOtherApps: true)
+            
+            let response = alert.runModal()
+            if response == .alertFirstButtonReturn {
+                WindowManager.shared.hideNote(note)
+            } else if response == .alertThirdButtonReturn {
+                WindowManager.shared.deleteNote(note)
+            }
         }
     }
     

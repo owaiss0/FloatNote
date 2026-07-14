@@ -2,6 +2,18 @@
 
 FloatNote is a sleek, feature-rich floating sticky notes manager for macOS, designed to keep your thoughts, code snippets, and tasks accessible right from the menu bar. Built natively in **Swift** and **SwiftUI**, it offers fluid animations, premium custom card layouts, and complete keyboard shortcut customization.
 
+<p align="center">
+  <img src="Assets/screenshots/app_icon.png" width="128" alt="FloatNote App Icon" />
+</p>
+
+## Previews 📸
+
+<p align="center">
+  <img src="Assets/screenshots/screenshot_note.png" width="45%" alt="Sticky Note Interface" />
+  &nbsp;&nbsp;
+  <img src="Assets/screenshots/screenshot_dashboard.png" width="45%" alt="Notes Dashboard" />
+</p>
+
 ---
 
 ## Key Features ✨
