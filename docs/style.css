@@ -256,15 +256,65 @@ body {
     font-family: monospace;
 }
 
-.quarantine-tip {
-    font-size: 11px;
-    color: var(--text-secondary);
-    background-color: rgba(234, 179, 8, 0.05);
+.quarantine-box {
+    margin-top: 20px;
+    background-color: rgba(234, 179, 8, 0.04);
     border: 1px solid rgba(234, 179, 8, 0.15);
-    padding: 10px 14px;
-    border-radius: 8px;
-    margin-top: 16px;
+    padding: 16px;
+    border-radius: 10px;
     max-width: 480px;
+}
+
+.quarantine-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #eab308;
+}
+
+.quarantine-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.code-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-family: monospace;
+    font-size: 11px;
+}
+
+.code-container code {
+    color: #60a5fa;
+    user-select: all;
+}
+
+.copy-btn {
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.copy-btn:hover {
+    background-color: #2563eb;
+}
+
+.copy-btn.copied {
+    background-color: #10b981;
 }
 
 /* Features Grid */

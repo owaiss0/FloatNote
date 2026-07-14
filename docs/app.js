@@ -179,5 +179,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (notes.length === 0) {
             screenBody.innerHTML = '<div class="placeholder-text">Press a hotkey combination above to test (e.g. ⌘ + N)</div>';
         }
+    // Copy Command to Clipboard
+    const copyBtn = document.getElementById('copy-cmd-btn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+            const cmdText = document.getElementById('quarantine-cmd').textContent;
+            navigator.clipboard.writeText(cmdText).then(() => {
+                const textSpan = copyBtn.querySelector('.copy-text') || copyBtn;
+                textSpan.textContent = 'Copied!';
+                copyBtn.classList.add('copied');
+                
+                setTimeout(() => {
+                    textSpan.textContent = 'Copy';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        });
     }
 });

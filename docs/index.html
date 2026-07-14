@@ -36,7 +36,18 @@
                     <a href="https://github.com/owaiss0/FloatNote/releases/latest/download/FloatNote.dmg" class="btn btn-primary">Download for macOS</a>
                     <a href="#demo" class="btn btn-outline">See How It Works</a>
                 </div>
-                <p class="quarantine-tip">⚠️ <strong>Gatekeeper Note:</strong> If macOS warns the app is "damaged", copy FloatNote to your Applications folder and run <code>xattr -cr /Applications/FloatNote.app</code> in Terminal to open it.</p>
+                <div class="quarantine-box">
+                    <div class="quarantine-header">
+                        <span>⚠️ <strong>Gatekeeper Warning (macOS)</strong></span>
+                    </div>
+                    <p class="quarantine-desc">If macOS warns that the app is "damaged and cannot be opened", copy FloatNote to your Applications folder and run the command below in Terminal:</p>
+                    <div class="code-container">
+                        <code id="quarantine-cmd">xattr -cr /Applications/FloatNote.app</code>
+                        <button class="copy-btn" id="copy-cmd-btn" aria-label="Copy command">
+                            <span class="copy-text">Copy</span>
+                        </button>
+                    </div>
+                </div>
             </div>
             
             <div class="hero-visual">
