@@ -179,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (notes.length === 0) {
             screenBody.innerHTML = '<div class="placeholder-text">Press a hotkey combination above to test (e.g. ⌘ + N)</div>';
         }
+    }
     // Copy Command to Clipboard
     const copyBtn = document.getElementById('copy-cmd-btn');
     if (copyBtn) {
