@@ -41,8 +41,21 @@ public struct ScrollableTextView: NSViewRepresentable {
     public func updateNSView(_ nsView: NSScrollView, context: Context) {
         guard let textView = nsView.documentView as? NSTextView else { return }
         
-        if textView.string != text {
-            textView.string = text
+        // Prevent updates if the user is actively composing text (e.g. IME or autocorrect)
+        if !textView.hasMarkedText() && textView.string != text {
+            let selectedRange = textView.selectedRange()
+            
+            // Replace characters in text storage to preserve undo actions
+            if let textStorage = textView.textStorage {
+                textStorage.replaceCharacters(in: NSRange(location: 0, length: textStorage.length), with: text)
+            } else {
+                textView.string = text
+            }
+            
+            // Restore selection range
+            if selectedRange.location + selectedRange.length <= text.utf16.count {
+                textView.setSelectedRange(selectedRange)
+            }
         }
         
         if textView.isEditable != isEditable {

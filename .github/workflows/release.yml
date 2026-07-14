@@ -1,76 +1,85 @@
-name: Build & Release DMG
+name: Release
 
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*' # Trigger only when pushing version tags, e.g. v1.0.0
+
+permissions:
+  contents: write
 
 jobs:
-  release:
+  build-and-release:
     runs-on: macos-latest
-    permissions:
-      contents: write
-
+    
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Build App (Release Mode)
-      run: swift build -c release
+      - name: Build Application
+        run: |
+          swift build -c release --sdk $(xcrun --show-sdk-path)
 
-    - name: Package App Bundle
-      run: |
-        mkdir -p FloatNote.app/Contents/MacOS
-        mkdir -p FloatNote.app/Contents/Resources
-        cp .build/release/FloatNote FloatNote.app/Contents/MacOS/FloatNote
-        cp Assets/AppIcon.icns FloatNote.app/Contents/Resources/AppIcon.icns
-        
-        # Create Info.plist so macOS recognizes the app bundle, icon, and Menu Bar accessory behaviors
-        cat <<EOF > FloatNote.app/Contents/Info.plist
-        <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-        <plist version="1.0">
-        <dict>
-            <key>CFBundleExecutable</key>
-            <string>FloatNote</string>
-            <key>CFBundleIconFile</key>
-            <string>AppIcon.icns</string>
-            <key>CFBundleIdentifier</key>
-            <string>com.owais.FloatNote</string>
-            <key>CFBundleName</key>
-            <string>FloatNote</string>
-            <key>CFBundlePackageType</key>
-            <string>APPL</string>
-            <key>CFBundleShortVersionString</key>
-            <string>1.0.0</string>
-            <key>LSMinimumSystemVersion</key>
-            <string>11.0</string>
-            <key>LSUIElement</key>
-            <true/>
-        </dict>
-        </plist>
-        EOF
+      - name: Package Application Bundle
+        run: |
+          BIN_PATH=$(swift build -c release --show-bin-path)
+          APP_DIR="./FloatNote.app"
+          
+          # Extract version from tag (e.g. refs/tags/v1.1.0 -> 1.1.0)
+          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          
+          mkdir -p "$APP_DIR/Contents/MacOS"
+          mkdir -p "$APP_DIR/Contents/Resources"
+          cp "$BIN_PATH/FloatNote" "$APP_DIR/Contents/MacOS/FloatNote"
+          
+          # Create Info.plist with dynamic tag version
+          cat <<EOF > "$APP_DIR/Contents/Info.plist"
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>CFBundleDevelopmentRegion</key>
+              <string>en</string>
+              <key>CFBundleExecutable</key>
+              <string>FloatNote</string>
+              <key>CFBundleIconFile</key>
+              <string>AppIcon</string>
+              <key>CFBundleIdentifier</key>
+              <string>co.owais.FloatNote</string>
+              <key>CFBundleInfoDictionaryVersion</key>
+              <string>6.0</string>
+              <key>CFBundleName</key>
+              <string>FloatNote</string>
+              <key>CFBundlePackageType</key>
+              <string>APPL</string>
+              <key>CFBundleShortVersionString</key>
+              <string>$TAG_VERSION</string>
+              <key>CFBundleVersion</key>
+              <string>1</string>
+              <key>LSMinimumSystemVersion</key>
+              <string>14.0</string>
+              <key>LSUIElement</key>
+              <true/>
+          </dict>
+          </plist>
+          EOF
+          
+          # Copy icon if available
+          if [ -f "./Assets/AppIcon.icns" ]; then
+              cp "./Assets/AppIcon.icns" "$APP_DIR/Contents/Resources/AppIcon.icns"
+          fi
+          
+          # Sign application
+          codesign --force --deep --sign - "$APP_DIR"
+          
+          # Zip it up
+          zip -q -r ./FloatNote.zip "$APP_DIR"
 
-    - name: Install create-dmg
-      run: brew install create-dmg
-
-    - name: Create DMG (Visual Drag-and-Drop Installer)
-      run: |
-        create-dmg \
-          --volname "FloatNote Installer" \
-          --volicon "Assets/AppIcon.icns" \
-          --window-pos 200 120 \
-          --window-size 600 400 \
-          --icon-size 128 \
-          --icon "FloatNote.app" 175 120 \
-          --hide-extension "FloatNote.app" \
-          --app-drop-link 425 120 \
-          "FloatNote.dmg" \
-          "FloatNote.app"
-
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v2
-      with:
-        files: FloatNote.dmg
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./FloatNote.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

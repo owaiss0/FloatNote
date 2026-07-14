@@ -1,11 +1,19 @@
 import AppKit
 import SwiftUI
 
+// MARK: - Custom NSHostingView that accepts first mouse click
+public class ClickThroughHostingView<Content: View>: NSHostingView<Content> {
+    override public func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+        return true
+    }
+}
+
+// MARK: - Floating Panel
 public class FloatingPanel: NSPanel {
     public init(contentRect: NSRect, backing: NSWindow.BackingStoreType = .buffered, defer flag: Bool = false) {
         super.init(
             contentRect: contentRect,
-            styleMask: [.titled, .resizable, .fullSizeContentView, .nonactivatingPanel],
+            styleMask: [.resizable, .fullSizeContentView, .nonactivatingPanel],
             backing: backing,
             defer: flag
         )
@@ -19,7 +27,7 @@ public class FloatingPanel: NSPanel {
         // Seamless visual appearance
         self.titleVisibility = .hidden
         self.titlebarAppearsTransparent = true
-        self.isMovableByWindowBackground = false
+        self.isMovableByWindowBackground = false // Set to false to prevent native titlebar interception
         self.backgroundColor = .clear
         self.hasShadow = true
         self.minSize = NSSize(width: 150, height: 40)
@@ -43,6 +51,7 @@ public class FloatingPanel: NSPanel {
     }
 }
 
+// MARK: - Draggable Window View Overlay
 public struct DraggableWindowView: NSViewRepresentable {
     public init() {}
     
@@ -55,6 +64,10 @@ public struct DraggableWindowView: NSViewRepresentable {
 
 class DraggableNSView: NSView {
     override func mouseDown(with event: NSEvent) {
-        self.window?.performDrag(with: event)
+        if event.clickCount == 2 {
+            super.mouseDown(with: event)
+        } else {
+            self.window?.performDrag(with: event)
+        }
     }
 }

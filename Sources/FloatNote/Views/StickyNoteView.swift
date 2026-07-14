@@ -25,6 +25,7 @@ public struct StickyNoteView: View {
     @State private var showCloseAlert = false
     @State private var isPreviewMode = false
     @State private var showSettingsPopover = false
+    @State private var isDragModeActive = false
     @State private var autoHideTask: Task<Void, Never>?
     
     @AppStorage("shortcutNewNoteKey") private var shortcutNewNoteKey: String = ""
@@ -107,6 +108,20 @@ public struct StickyNoteView: View {
                 .buttonStyle(.plain)
                 .help(note.isPinned ? "Unlock Note" : "Lock Note")
                 
+                // Drag Mode (Hand) Toggle Button
+                Button(action: {
+                    isDragModeActive.toggle()
+                }) {
+                    Image(systemName: isDragModeActive ? "hand.raised.fill" : "hand.raised")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(isDragModeActive ? .white : .black.opacity(0.45))
+                        .frame(width: 26, height: 26)
+                        .background(isDragModeActive ? Color.green : Color.black.opacity(0.08))
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .help(isDragModeActive ? "Disable Dragging" : "Enable Dragging")
+                
                 // New Note Button
                 Button(action: onNewNote) {
                     Image(systemName: "plus.circle.fill")
@@ -121,7 +136,6 @@ public struct StickyNoteView: View {
             .background(
                 StickyNote.circleFill(for: note.colorHex).opacity(0.95)
             )
-            .background(DraggableWindowView()) // Native window dragging on the header background!
             .background(
                 Color.clear
                     .contentShape(Rectangle())
@@ -321,12 +335,54 @@ public struct StickyNoteView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .noteBackground(for: note.colorHex)
-        .background(DraggableWindowView()) // Native window dragging on the body background!
         .opacity(note.isAutoHidden ? 0.0 : note.opacity)
         .clipShape(.rect(cornerRadius: 12))
         .overlay {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.black.opacity(0.15), lineWidth: 1)
+                .allowsHitTesting(false)
+        }
+        .overlay {
+            if isDragModeActive {
+                ZStack(alignment: .topTrailing) {
+                    // Full-window dragging background
+                    Color.black.opacity(0.12)
+                        .background(DraggableWindowView())
+                    
+                    // Large center drag indicator
+                    VStack {
+                        Spacer()
+                        VStack(spacing: 8) {
+                            Image(systemName: "hand.raised.fill")
+                                .font(.system(size: 24, weight: .bold))
+                                .foregroundStyle(.white)
+                            Text("Drag Mode Active")
+                                .font(.system(size: 11, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white)
+                        }
+                        .allowsHitTesting(false)
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    
+                    // Clickable exit button aligned with header hand icon
+                    Button(action: {
+                        isDragModeActive = false
+                    }) {
+                        Image(systemName: "hand.raised.fill")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(.white)
+                            .frame(width: 26, height: 26)
+                            .background(Color.green)
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.top, 8)
+                    .padding(.trailing, 31)
+                    .help("Disable Dragging")
+                }
+                .clipShape(.rect(cornerRadius: 12))
+            }
         }
         // Force Light colorScheme to avoid dark-mode contrast issues
         .colorScheme(.light)
@@ -422,6 +478,9 @@ public struct StickyNoteView: View {
         .onReceive(NotificationCenter.default.publisher(for: Notification.Name("WindowResignedKey-\(note.id.uuidString)"))) { _ in
             resetAutoHideTimer()
         }
+        .onDisappear {
+            autoHideTask?.cancel()
+        }
         .ignoresSafeArea()
     }
     
@@ -434,7 +493,7 @@ public struct StickyNoteView: View {
             alert.messageText = "Close Note"
             alert.informativeText = "What do you want to do with this note? You can hide it to view later, or delete it permanently."
             alert.alertStyle = .warning
-            alert.addButton(withTitle: "Keep & Hide Note")
+            alert.addButton(withTitle: "Save")
             alert.addButton(withTitle: "Cancel")
             alert.addButton(withTitle: "Delete Permanently")
             
@@ -625,8 +684,7 @@ public struct StickyNoteView: View {
         
         var urls: [URL] = []
         for match in matches {
-            if let range = Range(match.range, in: text),
-               let url = URL(string: String(text[range])) {
+            if let url = match.url {
                 urls.append(url)
             }
         }
@@ -656,5 +714,18 @@ public struct StickyNoteView: View {
         case "#FFD1A9": return "Orange"
         default: return colorOption
         }
+    }
+    
+    // Drag mode helper view
+    private var dragActiveOverlay: some View {
+        VStack(spacing: 8) {
+            Image(systemName: "hand.raised.fill")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundStyle(.white)
+            Text("Drag Mode Active")
+                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+        }
+        .allowsHitTesting(false)
     }
 }

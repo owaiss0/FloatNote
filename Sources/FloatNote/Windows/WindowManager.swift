@@ -8,6 +8,8 @@ public final class WindowManager: NSObject, ObservableObject, NSWindowDelegate {
     
     @Published public var notes: [StickyNote] = []
     
+    public var isAppTerminating = false
+    
     private var windows: [UUID: FloatingPanel] = [:]
     private var preferencesWindow: NSWindow?
     private var dashboardWindow: NSWindow?
@@ -86,10 +88,10 @@ public final class WindowManager: NSObject, ObservableObject, NSWindowDelegate {
         let view = StickyNoteView(note: note, onDelete: { [weak self] in
             self?.deleteNote(note)
         }, onNewNote: { [weak self] in
-            self?.createNewNote()
+            self?.createNewNote(relativeTo: note)
         })
         
-        panel.contentView = NSHostingView(rootView: view)
+        panel.contentView = ClickThroughHostingView(rootView: view)
         panel.delegate = self
         panel.identifier = NSUserInterfaceItemIdentifier(note.id.uuidString)
         
@@ -101,10 +103,29 @@ public final class WindowManager: NSObject, ObservableObject, NSWindowDelegate {
         NSApp.activate(ignoringOtherApps: true) // Activate app on spawn
     }
     
-    public func createNewNote() {
+    public func createNewNote(relativeTo sourceNote: StickyNote? = nil) {
         let screen = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
-        let x = screen.midX - 160
-        let y = screen.midY - 160
+        var x = screen.midX - 160
+        var y = screen.midY - 160
+        
+        if let source = sourceNote {
+            x = source.x + 30
+            y = source.y - 30
+        }
+        
+        // Find existing open note coordinates to offset and cascade
+        let openNotes = notes.filter { $0.isWindowOpen }
+        while openNotes.contains(where: { abs($0.x - x) < 5 && abs($0.y - y) < 5 }) {
+            x += 30
+            y -= 30 // Shifting down-right in macOS AppKit screen coordinates (y increases going upwards)
+            
+            // If the note goes too far right or down, wrap it back to center
+            if x + 320 > screen.maxX || y - 320 < screen.minY {
+                x = screen.midX - 160
+                y = screen.midY - 160
+                break
+            }
+        }
         
         // Use user-defined default color/opacity if available
         let defaultColorHex = UserDefaults.standard.string(forKey: "defaultColorHex") ?? "#FFF9A6"
@@ -125,16 +146,14 @@ public final class WindowManager: NSObject, ObservableObject, NSWindowDelegate {
     
     public func updateWindowVisibility(for note: StickyNote) {
         guard let window = windows[note.id] else { return }
-        let targetAlpha: CGFloat = note.isAutoHidden ? 0.0 : CGFloat(note.opacity)
+        let targetAlpha: CGFloat = note.isAutoHidden ? 0.1 : CGFloat(note.opacity)
         let isAutoHidden = note.isAutoHidden
         
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.3
             window.animator().alphaValue = targetAlpha
         } completionHandler: {
-            if isAutoHidden {
-                window.orderOut(nil) // Hide from screen and ignore mouse events
-            } else {
+            if !isAutoHidden {
                 window.makeKeyAndOrderFront(nil)
             }
         }
@@ -200,14 +219,14 @@ public final class WindowManager: NSObject, ObservableObject, NSWindowDelegate {
         
         let view = PreferencesView()
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 420, height: 320),
+            contentRect: NSRect(x: 0, y: 0, width: 420, height: 430),
             styleMask: [.titled, .closable, .miniaturizable],
             backing: .buffered,
             defer: false
         )
-        window.title = "Sticky Notes Preferences"
+        window.title = "FloatNote Settings"
         window.contentView = NSHostingView(rootView: view)
-        window.setFrameAutosaveName("PreferencesWindow")
+        window.setFrameAutosaveName("SettingsWindow")
         window.center()
         window.isReleasedWhenClosed = false
         window.makeKeyAndOrderFront(nil)
@@ -226,11 +245,13 @@ public final class WindowManager: NSObject, ObservableObject, NSWindowDelegate {
         let view = DashboardView()
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 850, height: 550),
-            styleMask: [.titled, .closable, .miniaturizable, .resizable],
+            styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
         window.title = "FloatNote Dashboard"
+        window.titlebarAppearsTransparent = true
+        window.titleVisibility = .hidden
         window.contentView = NSHostingView(rootView: view)
         window.setFrameAutosaveName("DashboardWindow")
         window.center()
@@ -251,6 +272,8 @@ public final class WindowManager: NSObject, ObservableObject, NSWindowDelegate {
     // MARK: - NSWindowDelegate
     
     public func windowShouldClose(_ sender: NSWindow) -> Bool {
+        if isAppTerminating { return true }
+        
         guard let idString = sender.identifier?.rawValue,
               let id = UUID(uuidString: idString) else { return true }
         

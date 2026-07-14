@@ -105,10 +105,17 @@ public struct PreferencesView: View {
                 .buttonStyle(.borderedProminent)
                 
                 Spacer()
+                
+                Button("Check for Updates...") {
+                    if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
+                        appDelegate.checkForUpdates()
+                    }
+                }
+                .buttonStyle(.bordered)
             }
         }
         .padding(20)
-        .frame(width: 420, height: 420)
+        .frame(width: 420, height: 430)
     }
     
     private func shortcutSelector(
@@ -141,8 +148,12 @@ public struct PreferencesView: View {
                 .controlSize(.small)
                 .multilineTextAlignment(.center)
                 .onChange(of: key.wrappedValue) { oldValue, newValue in
-                    if newValue.count > 1 {
-                        key.wrappedValue = String(newValue.prefix(1))
+                    let cleaned = newValue.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                    if cleaned != newValue {
+                        key.wrappedValue = cleaned
+                    }
+                    if key.wrappedValue.count > 1 {
+                        key.wrappedValue = String(key.wrappedValue.prefix(1))
                     }
                 }
         }

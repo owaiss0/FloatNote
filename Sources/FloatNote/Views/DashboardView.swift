@@ -12,55 +12,7 @@ struct DashboardView: View {
     
     var body: some View {
         NavigationSplitView {
-            // Sidebar List of Notes
-            VStack(spacing: 0) {
-                // Search Bar
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundStyle(.secondary)
-                    TextField("Search notes...", text: $searchText)
-                        .textFieldStyle(.plain)
-                        .focused($focusedField, equals: .search)
-                }
-                .padding(8)
-                .background(Color(NSColor.controlBackgroundColor))
-                .clipShape(.rect(cornerRadius: 8))
-                .padding(10)
-                
-                // Notes List
-                // Notes List
-                ScrollView {
-                    VStack(spacing: 6) {
-                        ForEach(filteredNotes) { note in
-                            DashboardNoteRow(note: note, isSelected: selectedNoteID == note.id)
-                                .onTapGesture {
-                                    selectedNoteID = note.id
-                                }
-                        }
-                    }
-                    .padding(8)
-                }
-                
-                Spacer()
-                
-                // Bottom bar
-                HStack {
-                    Button(action: createNewNote) {
-                        Label("New Note", systemImage: "square.and.pencil")
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(Color.accentColor)
-                    
-                    Spacer()
-                    
-                    Text("\(windowManager.notes.count) ^[note](inflect: true)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .padding(12)
-                .background(Color(NSColor.windowBackgroundColor))
-            }
-            .navigationTitle("FloatNote")
+            sidebarView
         } detail: {
             // Detail editor or placeholder
             if let noteID = selectedNoteID, let note = windowManager.notes.first(where: { $0.id == noteID }) {
@@ -77,6 +29,59 @@ struct DashboardView: View {
                 .hidden()
         )
     }
+    
+    private var sidebarView: some View {
+        VStack(spacing: 0) {
+            // Search Bar
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.secondary)
+                TextField("Search notes...", text: $searchText)
+                    .textFieldStyle(.plain)
+                    .focused($focusedField, equals: .search)
+            }
+            .padding(8)
+            .background(Color(NSColor.controlBackgroundColor))
+            .clipShape(.rect(cornerRadius: 8))
+            .padding(10)
+            .padding(.top, 36)
+            
+            // Notes List
+            ScrollView {
+                VStack(spacing: 6) {
+                    ForEach(filteredNotes) { note in
+                        DashboardNoteRow(note: note, isSelected: selectedNoteID == note.id)
+                            .onTapGesture {
+                                selectedNoteID = note.id
+                            }
+                    }
+                }
+                .padding(8)
+            }
+            
+            Spacer()
+            
+            // Bottom bar
+            HStack {
+                Button(action: createNewNote) {
+                    Label("New Note", systemImage: "square.and.pencil")
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(Color.accentColor)
+                
+                Spacer()
+                
+                Text("\(windowManager.notes.count) ^[note](inflect: true)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(12)
+            .background(Color.clear)
+        }
+        .background(.thinMaterial)
+        .navigationSplitViewColumnWidth(min: 220, ideal: 250, max: 320)
+    }
+    
     
     private var filteredNotes: [StickyNote] {
         if searchText.isEmpty {

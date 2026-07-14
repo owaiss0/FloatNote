@@ -137,24 +137,24 @@ public final class StickyNote: ObservableObject, Identifiable, Codable {
     }
     
     private func setupAutosave() {
-        let contentPublisher = $content.map { _ in () }
-        let colorPublisher = $colorHex.map { _ in () }
-        let xPublisher = $x.map { _ in () }
-        let yPublisher = $y.map { _ in () }
-        let wPublisher = $width.map { _ in () }
-        let hPublisher = $height.map { _ in () }
+        let contentPublisher = $content.dropFirst().map { _ in () }
+        let colorPublisher = $colorHex.dropFirst().map { _ in () }
+        let xPublisher = $x.dropFirst().map { _ in () }
+        let yPublisher = $y.dropFirst().map { _ in () }
+        let wPublisher = $width.dropFirst().map { _ in () }
+        let hPublisher = $height.dropFirst().map { _ in () }
         
-        let titlePublisher = $title.map { _ in () }
-        let opacityPublisher = $opacity.map { _ in () }
-        let pinnedPublisher = $isPinned.map { _ in () }
-        let alwaysOnTopPublisher = $isAlwaysOnTop.map { _ in () }
-        let collapsedPublisher = $isCollapsed.map { _ in () }
-        let expandedHeightPublisher = $expandedHeight.map { _ in () }
+        let titlePublisher = $title.dropFirst().map { _ in () }
+        let opacityPublisher = $opacity.dropFirst().map { _ in () }
+        let pinnedPublisher = $isPinned.dropFirst().map { _ in () }
+        let alwaysOnTopPublisher = $isAlwaysOnTop.dropFirst().map { _ in () }
+        let collapsedPublisher = $isCollapsed.dropFirst().map { _ in () }
+        let expandedHeightPublisher = $expandedHeight.dropFirst().map { _ in () }
         
-        let autoHideEnabledPublisher = $isAutoHideEnabled.map { _ in () }
-        let autoHideDelayPublisher = $autoHideDelay.map { _ in () }
-        let autoHiddenPublisher = $isAutoHidden.map { _ in () }
-        let windowOpenPublisher = $isWindowOpen.map { _ in () }
+        let autoHideEnabledPublisher = $isAutoHideEnabled.dropFirst().map { _ in () }
+        let autoHideDelayPublisher = $autoHideDelay.dropFirst().map { _ in () }
+        let autoHiddenPublisher = $isAutoHidden.dropFirst().map { _ in () }
+        let windowOpenPublisher = $isWindowOpen.dropFirst().map { _ in () }
         
         let p1 = Publishers.Merge6(contentPublisher, colorPublisher, xPublisher, yPublisher, wPublisher, hPublisher)
         let p2 = Publishers.Merge6(titlePublisher, opacityPublisher, pinnedPublisher, alwaysOnTopPublisher, collapsedPublisher, expandedHeightPublisher)

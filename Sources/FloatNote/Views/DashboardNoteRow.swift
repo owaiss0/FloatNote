@@ -15,6 +15,8 @@ struct DashboardNoteRow: View {
                 Text(formattedDate(note.createdAt))
                     .font(.system(size: 11, design: .rounded))
                     .foregroundStyle(isSelected ? .white.opacity(0.8) : .secondary)
+                    .lineLimit(1)
+                    .layoutPriority(1)
                 
                 Text(note.content.isEmpty ? "No additional text" : note.content)
                     .font(.system(size: 11, design: .rounded))
